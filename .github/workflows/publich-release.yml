@@ -1,59 +1,45 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
-
-name: Node.js Package
-
-# on:
-#   release:
-#     types: [created]
 on:
   push:
-    tag:
-      - v*.*.**
+    branches:
+      - main
 
+# 按顺序运行作业
 jobs:
-  build:
+  publish-gpr:
+    # 指定的运行器环境
     runs-on: ubuntu-latest
+    # 设置 node 版本
+    strategy:
+      matrix:
+        node-version: [16]
     steps:
+      # 拉取 github 仓库代码
       - uses: actions/checkout@v3
+      # 设定 node 环境
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - run: npm ci
-      - run: npm test
-
-  publish-release:
-    name: Publish Release
-    runs-on: ubuntu-latest
-    needs: run-test
-    steps:
-      # 检出仓库代码
-      - name: Check Out Repo
-      - uses: actions/checkout@v2
-  create-release:
-    name: Create release
-    runs-on: ubuntu-latest
-    needs: publish-release
-    permissions:
-      contents: write
-    steps:
-      # 检出仓库代码
-      - name: Check Out Repo
-        uses: actions/checkout@v2
-      # Create gitHub release
-      - name: Create Github Release
-        uses: softprops/action-gh-release@v0.1.14
-
-  publish-npm:
-    needs: create-release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+          node-version: ${{ matrix.node-version }}
+          # 设置发包 npm 地址仓库
+          registry-url: https://registry.npmjs.org
+      # 安装依赖，相当于 npm ci
+      - name: Install dependencies 📦️
+        run: npm install
+      # 执行构建步骤
+      - name: 构建
+        run: |
+          npm run build
+      # 执行部署
+      - name: 部署
+        # 这个 action 会根据配置自动推送代码到指定分支
+        uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
+          # 指定密钥，即在第一步中设置的
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          # 指定推送到的远程分支
+          BRANCH: pages
+          # 指定构建之后的产物要推送哪个目录的代码
+          FOLDER: build
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          # 刚刚设置的 NPM_TOKEN
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
