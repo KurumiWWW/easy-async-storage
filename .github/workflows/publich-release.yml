@@ -8,7 +8,7 @@ name: Node.js Package
 #     types: [created]
 on:
   push:
-    tags:
+    tag:
       - v*.*.**
 
 jobs:
