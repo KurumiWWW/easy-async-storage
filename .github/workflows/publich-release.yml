@@ -1,41 +1,46 @@
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-# 按顺序运行作业
 jobs:
-  publish-gpr:
-    # 指定的运行器环境
+  publish-to-npm:
     runs-on: ubuntu-latest
-    # 设置 node 版本
-    strategy:
-      matrix:
-        node-version: [16]
     steps:
-      # 拉取 github 仓库代码
-      - uses: actions/checkout@v3
-      # 设定 node 环境
-      - uses: actions/setup-node@v3
+      - name: Checkout release branch code
+        uses: actions/checkout@v2
         with:
-          node-version: ${{ matrix.node-version }}
-          # 设置发包 npm 地址仓库
+          fetch-depth: 1
+
+      - name: Get yarn cache
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12
           registry-url: https://registry.npmjs.org
-      # 安装依赖，相当于 npm ci
-      - name: Install dependencies 📦️
-        run: npm install
-      # 执行部署
-      - name: 部署
-        # 这个 action 会根据配置自动推送代码到指定分支
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          # 指定密钥，即在第一步中设置的
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          # 指定推送到的远程分支
-          BRANCH: main
-          # 指定构建之后的产物要推送哪个目录的代码
-          FOLDER: /
-      - run: npm publish
+
+      - name: "Automated Version Bump"
+        uses: "phips28/gh-action-bump-version@master"
         env:
-          # 刚刚设置的 NPM_TOKEN
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          default: prerelease
+          rc-wording: "RELEASE,alpha,PicX"
+
+      - name: Publish to NPM
+        run: npm publish || true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
