@@ -33,6 +33,8 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           # 指定推送到的远程分支
           BRANCH: main
+          # 指定构建之后的产物要推送哪个目录的代码
+          FOLDER: /
       - run: npm publish
         env:
           # 刚刚设置的 NPM_TOKEN
