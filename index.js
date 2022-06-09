@@ -1,54 +1,50 @@
 const DEFAULT_OUT_TIME = 1000;
 const DEFAULT_STEP = 500;
-class EStorage {}
-class ESession extends EStorage {
-  asyncGet(key, timeout) {
-    return new Promise((resolve, reject) => {
-      let timer = 0;
-      let out =
-        timeout !== null && timeout !== void 0 ? timeout : DEFAULT_OUT_TIME;
-      let step = DEFAULT_STEP;
-      let count = 0;
-      timer = setInterval(() => {
-        const result = sessionStorage.getItem(key);
-        count += step;
-        if (result) {
-          clearInterval(timer);
-          resolve(result);
-        } else if (count >= out) {
-          reject(undefined);
-        }
-      }, step);
-    });
-  }
+class AbstractEStorage {
+    set(key, value) {
+        this.storage.setItem(key, value);
+        return this;
+    }
+    get(key) {
+        let value = this.storage.getItem(key);
+        return value;
+    }
+    asyncGet(key, timeout = DEFAULT_OUT_TIME, step = DEFAULT_STEP) {
+        return new Promise((resolve, reject) => {
+            let counter = 0;
+            let timer = setInterval(() => {
+                const result = this.get(key);
+                counter += step;
+                if (result) {
+                    clearInterval(timer);
+                    counter = 0;
+                    resolve(result);
+                }
+                else if (counter >= timeout) {
+                    reject(null);
+                }
+            }, step);
+        });
+    }
 }
-class ELcoal extends EStorage {
-  asyncGet(key, timeout) {
-    return new Promise((resolve, reject) => {
-      let timer = 0;
-      let out =
-        timeout !== null && timeout !== void 0 ? timeout : DEFAULT_OUT_TIME;
-      let step = DEFAULT_STEP;
-      let count = 0;
-      timer = setInterval(() => {
-        const result = localStorage.getItem(key);
-        count += step;
-        if (result) {
-          clearInterval(timer);
-          resolve(result);
-        } else if (count >= out) {
-          reject(undefined);
-        }
-      }, step);
-    });
-  }
+class ESession extends AbstractEStorage {
+    constructor() {
+        super(...arguments);
+        this.storage = sessionStorage;
+    }
+    keep() {
+        return new ELocal();
+    }
 }
-export const useEStorage = (type) => {
-  if (type == "local") {
-    return new ELcoal();
-  } else if (type == "session") {
+class ELocal extends AbstractEStorage {
+    constructor() {
+        super(...arguments);
+        this.storage = localStorage;
+    }
+    unKeep() {
+        return new ESession();
+    }
+}
+export const useEst = () => {
     return new ESession();
-  } else {
-    return undefined;
-  }
 };
