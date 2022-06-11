@@ -1,6 +1,7 @@
 on:
   push:
     tags: v1.**.**
+
 jobs:
   publish-to-npm:
     runs-on: ubuntu-latest
