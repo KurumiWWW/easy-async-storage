@@ -1,6 +1,9 @@
-# easy-async-storage
+<h1>
+  easy-async-storage
+  <h3>用更简单的方式操作浏览器存储</h3>
+</h1>
 
-> 浏览器异步获取 sessionStorage/localStorage 的解决方案
+[![easy-async-storage](https://img.shields.io/npm/v/easy-async-storage.svg?style=flat-square)](https://www.npmjs.com/package/easy-async-storage) [![NPM downloads](https://img.shields.io/npm/dt/easy-async-storage.svg?style=flat-square)](https://npmjs.org/package/view-ui-plus)
 
 ## 1.简介
 
