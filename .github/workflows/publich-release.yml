@@ -1,6 +1,6 @@
 on:
   push:
-    tags: v1.**.**"
+    tags: v1.**.**
 
 jobs:
   publish-to-npm:
