@@ -1,9 +1,11 @@
 <h1>
-  easy-async-storage
+  Easy Async Storage
   <h3>用更简单的方式操作浏览器存储</h3>
 </h1>
 
-[![easy-async-storage](https://img.shields.io/npm/v/easy-async-storage.svg?style=flat-square)](https://www.npmjs.com/package/easy-async-storage) [![NPM downloads](https://img.shields.io/npm/dt/easy-async-storage.svg?style=flat-square)](https://npmjs.org/package/view-ui-plus)
+[![easy-async-storage](https://img.shields.io/github/stars/KurumiWWW/easy-async-storage?style=social)](https://www.npmjs.com/package/easy-async-storage) 
+[![easy-async-storage](https://img.shields.io/npm/v/easy-async-storage.svg)](https://www.npmjs.com/package/easy-async-storage) 
+[![Stars](https://img.shields.io/npm/dt/easy-async-storage.svg)](https://github.com/KurumiWWW/easy-async-storage)
 
 ## 1.简介
 
