@@ -1,9 +1,6 @@
 on:
   push:
     tags: v1.**.**"
-    # branches: [main]
-  # pull_request:
-  # branches: [main]
 
 jobs:
   publish-to-npm:
