@@ -31,10 +31,10 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org
-      # - name: Npm Install
-      #   run: npm ci
-      # - name: Build
-      #   run: npm run build
+      - name: Npm Install
+        run: npm ci
+      - name: Build
+        run: npm run build
       - name: "Automated Version Bump"
         uses: "phips28/gh-action-bump-version@master"
         env:
