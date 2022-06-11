@@ -5,8 +5,8 @@ module.exports = {
   output: {
     library: "easy-async-storage",
     libraryTarget: "umd",
-    path: path.resolve(__dirname, 'dist'), // 指定打包文件的目录
-    filename: 'index.js' // 打包后文件的名称
+    filename: 'index.js', // 打包后文件的名称
+    path: path.resolve(__dirname, ''), // 指定打包文件的目录
   },
   // 指定webpack打包时要使用的模块
   module: {

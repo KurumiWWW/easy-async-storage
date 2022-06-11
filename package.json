@@ -1,13 +1,13 @@
 {
   "name": "easy-async-storage",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "repository": {
     "url": "https://github.com/KurumiWWW/easy-async-storage"
   },
   "description": "easy-async-storage",
   "main": "index.js",
   "files": [
-    "dist/*"
+    "index.js"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
