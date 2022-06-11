@@ -1,14 +1,23 @@
 {
   "name": "easy-async-storage",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "repository": {
     "url": "https://github.com/KurumiWWW/easy-async-storage"
   },
   "description": "easy-async-storage",
   "main": "index.js",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "author": "KurumiWWW",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.3",
+    "webpack-cli": "^4.9.2"
+  }
 }
