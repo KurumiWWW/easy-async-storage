@@ -7,16 +7,16 @@ interface CheckResult {
 }
 interface EStorage {
   storage: Storage;
-  check(key: string): CheckResult;
+  check(key: string): Promise<CheckResult>;
   getStorage(key: string): string;
   set(key: string, value: string): EStorage;
-  get(key: string): string;
+  get(key: string): Promise<any>;
   asyncGet(key: string): Promise<string>;
 }
 
 abstract class AbstractEStorage implements EStorage {
   abstract storage: Storage;
-  abstract check(key: string): CheckResult;
+  abstract stateTrigger(): EStorage;
   abstract getStorage(key: string): string;
   set(key: string, value: string): EStorage {
     if (typeof value != "string") {
@@ -25,10 +25,10 @@ abstract class AbstractEStorage implements EStorage {
     this.storage.setItem(key, value);
     return this;
   }
-  get(key: string): string {
-    let checkObj: CheckResult = this.check(key);
-    if (checkObj.status && checkObj.target) {
-      return checkObj.target.getStorage(key);
+  async get(key: string): Promise<any> {
+    const res = await this.check(key);
+    if (res.status) {
+      return res.target?.getStorage(key);
     } else {
       throw new Error(`Cannot find value where key is "${key}"`);
     }
@@ -41,16 +41,36 @@ abstract class AbstractEStorage implements EStorage {
     return new Promise((resolve, reject) => {
       let counter: number = 0;
       let timer = setInterval(() => {
-        const result = this.get(key);
-        counter += step;
-        if (result) {
-          clearInterval(timer);
-          counter = 0;
-          resolve(result);
-        } else if (counter >= timeout) {
-          reject(new Error(`Cannot find value where key is "${key}"`));
-        }
+        this.get(key).then((result) => {
+          counter += step;
+          if (result) {
+            clearInterval(timer);
+            counter = 0;
+            resolve(result);
+          } else if (counter >= timeout) {
+            reject(new Error(`Cannot find value where key is "${key}"`));
+          }
+        });
       }, step);
+    });
+  }
+  check(key: string): Promise<CheckResult> {
+    return new Promise((resolve, reject) => {
+      if (sessionStorage.getItem(key) != null) {
+        resolve({
+          status: true,
+          target: this,
+        });
+      } else if (localStorage.getItem(key) != null) {
+        resolve({
+          status: true,
+          target: this.stateTrigger(),
+        });
+      } else {
+        reject({
+          status: false,
+        });
+      }
     });
   }
 }
@@ -60,29 +80,15 @@ class ESession extends AbstractEStorage {
   keep(): EStorage {
     return new ELocal();
   }
+  stateTrigger() {
+    return this.keep();
+  }
   getStorage(key: string): string {
     const result = sessionStorage.getItem(key);
     if (result == null) {
       throw new Error(`Cannot find value where key is "${key}"`);
     } else {
       return String(result);
-    }
-  }
-  check(key: string): CheckResult {
-    if (sessionStorage.getItem(key) != null) {
-      return {
-        status: true,
-        target: this,
-      };
-    } else if (localStorage.getItem(key) != null) {
-      return {
-        status: true,
-        target: this.keep(),
-      };
-    } else {
-      return {
-        status: false,
-      };
     }
   }
 }
@@ -92,6 +98,9 @@ class ELocal extends AbstractEStorage {
   unKeep(): EStorage {
     return new ESession();
   }
+  stateTrigger() {
+    return this.unKeep();
+  }
   getStorage(key: string): string {
     const result = localStorage.getItem(key);
     if (result == null) {
@@ -100,25 +109,17 @@ class ELocal extends AbstractEStorage {
       return String(result);
     }
   }
-  check(key: string): CheckResult {
-    if (localStorage.getItem(key) != null) {
-      return {
-        status: true,
-        target: this,
-      };
-    } else if (sessionStorage.getItem(key) != null) {
-      return {
-        status: true,
-        target: this.unKeep(),
-      };
-    } else {
-      return {
-        status: false,
-      };
-    }
-  }
 }
 
 export const eStorage = () => {
-  return new ESession();
+  // return new ESession();
+  const e = new ESession();
+  return {
+    keep: () => e.keep(),
+    set: (key: string, value: string) => e.set(key, value),
+    get: (key: string) => e.get(key),
+    asyncGet: (key: string, timeout?: number, step?: number) =>
+      e.asyncGet(key, timeout, step),
+    check: (key: string) => e.check(key),
+  };
 };
