@@ -6,6 +6,12 @@
   },
   "description": "easy-async-storage",
   "main": "index.js",
+  "keywords": [
+    "storage",
+    "async-storage",
+    "easy-storage",
+    "async"
+  ],
   "files": [
     "index.js",
     "index.d.ts"
