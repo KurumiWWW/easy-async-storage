@@ -1,11 +1,17 @@
 {
   "name": "easy-async-storage",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "repository": {
     "url": "https://github.com/KurumiWWW/easy-async-storage"
   },
   "description": "easy-async-storage",
   "main": "index.js",
+  "keywords": [
+    "storage",
+    "async-storage",
+    "easy-storage",
+    "async"
+  ],
   "files": [
     "index.js",
     "index.d.ts"
