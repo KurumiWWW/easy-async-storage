@@ -3,9 +3,15 @@
   <h3>用更简单的方式操作浏览器存储</h3>
 </h1>
 
-[![easy-async-storage](https://img.shields.io/github/stars/KurumiWWW/easy-async-storage?style=social)](https://www.npmjs.com/package/easy-async-storage) 
-[![easy-async-storage](https://img.shields.io/npm/v/easy-async-storage.svg)](https://www.npmjs.com/package/easy-async-storage) 
+[![easy-async-storage](https://img.shields.io/github/stars/KurumiWWW/easy-async-storage?style=social)](https://www.npmjs.com/package/easy-async-storage)
+[![easy-async-storage](https://img.shields.io/npm/v/easy-async-storage.svg)](https://www.npmjs.com/package/easy-async-storage)
 [![Stars](https://img.shields.io/npm/dt/easy-async-storage.svg)](https://github.com/KurumiWWW/easy-async-storage)
+
+**如果有意见、建议或者发现的 bug，欢迎您通过 issue 进行反馈！**
+
+GitHub: https://github.com/KurumiWWW/easy-async-storage
+
+Gitee: **_建设中..._**
 
 ## 1.简介
 
@@ -15,7 +21,7 @@
 
 ### 目前已有功能
 
-使用面向对象思想对存储方式进行二次封装，让 Storage 操作能够更加简便快捷，**不需要**考虑某条数据存在于`localStorage`还是`sessionStorage`。
+- 使用面向对象思想对存储方式进行二次封装，让 Storage 操作能够更加简便快捷，**不需要**考虑某条数据存在于`localStorage`还是`sessionStorage`。
 
 ### TODO
 
@@ -29,19 +35,32 @@ npm install easy-async-storage
 
 ## 3.Use
 
-`eStorage()`会返回一个实例化的`EStorage`对象
+`eStorage()`的暴露方式类似`Vue Composition API`
 
 ```ts
-import { eStorage } from "easy-async-storage";
+const { keep, set, get, asyncGet, check } = eStorage();
+```
+
+或
+
+```ts
 const est = eStorage();
 ```
 
 ### 3.1 Get Storage
 
-获取存储数据，调用对象的`get`方法，返回类型为`string`
+获取存储数据，调用对象的`get`方法，返回类型为`Promise`
 
 ```ts
-est.get(key:string):string;
+est.get(key:string):Promise<any>;
+```
+
+```ts
+est.get(key:string).then(res=>{
+  // res即为获取到的value
+}).catch(err=>{
+  // 未获取到的操作
+})
 ```
 
 ### 3.2 Async Get Storage
@@ -84,12 +103,18 @@ est.keep().set(key: string, value: string);
 使用：
 
 ```ts
-est.check(key: string);
+est.check(key: string).then(res=>{
+  // 存储存在的操作
+}).catch(()=>{
+  // 存储不存在的操作
+});
 ```
 
 返回的数据类型：
 
 ```ts
+Promise<CheckResult>
+
 interface CheckResult {
   status: boolean;
   target?: EStorage;
